@@ -65,6 +65,7 @@ import { LabelScannerModal } from '@/components/LabelScannerModal';
 import { FitMakerModal } from '@/components/FitMakerModal';
 import { FastingTimerModal } from '@/components/FastingTimerModal';
 import { AchievementsModal } from '@/components/AchievementsModal';
+import { getLocalDateString, shiftDateString } from '@/lib/date-utils';
 
 export default function NutriScanApp() {
   const [session, setSession] = useState<any>(null);
@@ -161,7 +162,7 @@ export default function NutriScanApp() {
 
   // 1. Manejo de Sesión de Supabase
   useEffect(() => {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getLocalDateString();
     setTodayStr(today);
     setSelectedDate(today);
 
@@ -516,7 +517,7 @@ export default function NutriScanApp() {
   // 13. Manejo de Agua (Persistencia en Supabase y localStorage)
   async function handleUpdateWater(newMl: number) {
     setWaterMl(newMl);
-    const dateKey = selectedDate || todayStr || new Date().toISOString().slice(0, 10);
+    const dateKey = selectedDate || todayStr || getLocalDateString();
     localStorage.setItem(`nutriscan_water_${dateKey}`, String(newMl));
 
     if (session?.user?.id) {
@@ -559,15 +560,15 @@ export default function NutriScanApp() {
     localStorage.setItem('nutriscan_favorites', JSON.stringify(updated));
   }
 
-  // Filtro de Comidas y Ejercicios según la fecha seleccionada
+  // Filtro de Comidas y Ejercicios según la fecha seleccionada en horario local
   const filteredFoodLogs = foodLogs.filter((log) => {
     if (!log.created_at) return true;
-    return log.created_at.slice(0, 10) === selectedDate;
+    return getLocalDateString(log.created_at) === selectedDate;
   });
 
   const filteredExerciseLogs = exerciseLogs.filter((ex) => {
     if (!ex.created_at) return true;
-    return ex.created_at.slice(0, 10) === selectedDate;
+    return getLocalDateString(ex.created_at) === selectedDate;
   });
 
   // Totales de la fecha seleccionada
@@ -743,10 +744,8 @@ export default function NutriScanApp() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
-                const base = selectedDate || todayStr || new Date().toISOString().slice(0, 10);
-                const d = new Date(base);
-                d.setDate(d.getDate() - 1);
-                setSelectedDate(d.toISOString().slice(0, 10));
+                const base = selectedDate || todayStr || getLocalDateString();
+                setSelectedDate(shiftDateString(base, -1));
               }}
               className="p-1 hover:bg-slate-800 rounded-lg text-slate-400"
             >
@@ -760,10 +759,8 @@ export default function NutriScanApp() {
 
             <button
               onClick={() => {
-                const base = selectedDate || todayStr || new Date().toISOString().slice(0, 10);
-                const d = new Date(base);
-                d.setDate(d.getDate() + 1);
-                setSelectedDate(d.toISOString().slice(0, 10));
+                const base = selectedDate || todayStr || getLocalDateString();
+                setSelectedDate(shiftDateString(base, 1));
               }}
               className="p-1 hover:bg-slate-800 rounded-lg text-slate-400"
             >

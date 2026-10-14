@@ -62,7 +62,7 @@ export function ExportReportModal({
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', `nutriscan_reporte_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `nutriscan_reporte_${new Date().toLocaleDateString('en-CA')}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
