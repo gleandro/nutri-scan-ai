@@ -171,6 +171,9 @@ export default function NutriScanApp() {
       if (session) {
         loadUserData(session.user.id);
         loadWaterForDate(session.user.id, today);
+        if (typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
+          window.history.replaceState(null, '', window.location.pathname);
+        }
       }
     });
 
@@ -179,6 +182,9 @@ export default function NutriScanApp() {
       if (session) {
         loadUserData(session.user.id);
         loadWaterForDate(session.user.id, today);
+        if (typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
+          window.history.replaceState(null, '', window.location.pathname);
+        }
       }
     });
 
@@ -307,7 +313,14 @@ export default function NutriScanApp() {
     setAuthNotice('');
 
     if (isSignUp) {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const redirectUrl = typeof window !== 'undefined' ? window.location.origin : undefined;
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
+      });
       if (error) {
         setAuthError(error.message);
         return;
